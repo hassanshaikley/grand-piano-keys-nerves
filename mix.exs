@@ -34,7 +34,7 @@ defmodule HelloNerves.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :runtime_tools],
+      extra_applications: [:logger, :runtime_tools, :scenic],
       mod: {HelloNerves.Application, []}
     ]
   end
@@ -72,7 +72,9 @@ defmodule HelloNerves.MixProject do
       {:nerves_system_x86_64, "~> 1.24", runtime: false, targets: :x86_64},
       {:nerves_system_grisp2, "~> 0.8", runtime: false, targets: :grisp2},
       {:nerves_system_mangopi_mq_pro, "~> 0.6", runtime: false, targets: :mangopi_mq_pro},
-      {:circuits_gpio, "~> 2.1"}
+      {:circuits_gpio, "~> 2.1"},
+      {:scenic, "~> 0.11.0"},
+      {:scenic_driver_local, "~> 0.11.0"}
     ]
   end
 

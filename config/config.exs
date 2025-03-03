@@ -23,3 +23,17 @@ if Mix.target() == :host do
 else
   import_config "target.exs"
 end
+
+config :scenic, :assets, module: HelloNerves.Assets
+
+config :hello_nerves, :viewport,
+  size: {800, 480},
+  theme: :dark,
+  default_scene: HelloNerves.Scene.Home,
+  drivers: [
+    [
+      module: Scenic.Driver.Local,
+      window: [title: "hello_nerves"],
+      on_close: :stop_system
+    ]
+  ]

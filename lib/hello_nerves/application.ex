@@ -7,12 +7,15 @@ defmodule HelloNerves.Application do
 
   @impl true
   def start(_type, _args) do
+    viewport_config = Application.get_env(:hello_nerves, :viewport)
+
     children =
       [
         # Children for all targets
         # Starts a worker by calling: HelloNerves.Worker.start_link(arg)
         # {HelloNerves.Worker, arg},
-        {Main, []}
+        {Main, []},
+        {Scenic, [viewport_config]}
       ] ++ target_children()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
