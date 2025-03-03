@@ -4,7 +4,7 @@ import Config
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
 # configuring ring_logger.
 
-config :logger, backends: [RingLogger]
+config :logger, backends: [RingLogger], level: :debug
 
 # Use shoehorn to start the main application. See the shoehorn
 # library documentation for more control in ordering how OTP
@@ -93,3 +93,5 @@ config :mdns_lite,
 # Uncomment to use target specific configurations
 
 # import_config "#{Mix.target()}.exs"
+
+config :hello_nerves, on_host: false
