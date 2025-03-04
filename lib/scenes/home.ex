@@ -83,9 +83,35 @@ defmodule HelloNerves.Scene.Home do
 
     Process.send_after(self(), :loop, 250)
 
+    play_backing_track()
+
     scene = push_graph(scene, game_page(0))
 
     {:noreply, scene}
+  end
+
+  def play_backing_track() do
+    audio_player_cmd =
+      if Application.get_env(:hello_nerves, :on_host) do
+        "afplay"
+      else
+        "aplay -q"
+      end
+
+    file_name = "mary_btrack.wav"
+
+    spawn(fn ->
+      # if Mix.target() in [rpi, rpi2, rpi3], do: "#{audio_player} -q", else: audio_player
+
+      static_directory_path =
+        Path.join(:code.priv_dir(:hello_nerves), "audio")
+
+      full_path =
+        Path.join(static_directory_path, file_name)
+
+      "#{audio_player_cmd} #{full_path}" |> IO.inspect()
+      :os.cmd('#{audio_player_cmd} #{full_path}') |> IO.inspect()
+    end)
   end
 
   def loop do

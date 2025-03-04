@@ -21,7 +21,7 @@ defmodule Main do
   def init(elements) do
     # Process.send_after(self(), :loop, 1000)
     setup()
-    IO.puts("Hello")
+
     Logger.info("Hello")
     {:ok, elements}
   end

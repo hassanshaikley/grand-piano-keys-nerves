@@ -1,3 +1,38 @@
+defmodule Mix.Tasks.Compile.MyCompiler do
+  @moduledoc "A custom compiler for processing specific files"
+  use Mix.Task.Compiler
+
+  @impl Mix.Task.Compiler
+  def run(args) do
+    # Your compilation logic here
+    IO.puts("HELLO")
+    IO.puts("What")
+    build_path = Mix.Project.build_path() |> IO.inspect(label: :bpath)
+
+    IO.puts("OK?")
+    dest_folder = "lib/hello_nerves/priv/audio"
+
+    dest_path = Path.join([build_path, dest_folder]) |> IO.inspect(label: :dest_path)
+
+    # Create destination directory if needed
+    File.mkdir_p!(dest_path) |> IO.inspect(label: :mkdir)
+
+    # # Copy the folder
+    File.cp_r!("audio", dest_path)
+    # Return success status
+    # Options are: {:ok, []} | {:error, [diagnostic]} | {:noop, [diagnostic]}
+    {:ok, []}
+  end
+
+  # Optional: implement clean callback to clean up generated files
+  @impl Mix.Task.Compiler
+  def clean do
+    target_dir = Path.join(Mix.Project.build_path(), "lib/my_app/compiled_assets")
+    File.rm_rf!(target_dir)
+    {:ok, []}
+  end
+end
+
 defmodule HelloNerves.MixProject do
   use Mix.Project
 
@@ -27,7 +62,8 @@ defmodule HelloNerves.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: [{@app, release()}],
-      preferred_cli_target: [run: :host, test: :host]
+      preferred_cli_target: [run: :host, test: :host],
+      compilers: Mix.compilers() ++ [:my_compiler]
     ]
   end
 
