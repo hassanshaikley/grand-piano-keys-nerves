@@ -22,6 +22,8 @@ defmodule HelloNerves.Scene.Home do
 
   # --------------------------------------------------------
   def init(scene, _param, _opts) do
+    Process.flag(:trap_exit, true)
+
     # get the width and height of the viewport. This is to demonstrate creating
     # a transparent full-screen rectangle to catch user input
     {width, height} = scene.viewport.size
@@ -38,11 +40,14 @@ defmodule HelloNerves.Scene.Home do
     {:ok, scene}
   end
 
+  def terminate(_reason, _) do
+    Audio.killall()
+  end
+
   def handle_info(:loop, state) do
     iteration = Map.get(state, :iteration)
 
     Process.send_after(self(), :loop, 100)
-    IO.puts("Looping")
 
     push_graph(state, game_page(iteration))
 
@@ -78,8 +83,8 @@ defmodule HelloNerves.Scene.Home do
   end
 
   def handle_input(event, _context, scene) do
-    Logger.info("Received event: #{inspect(event)}")
-    IO.puts("Input received")
+    # Logger.info("Received event: #{inspect(event)}")
+    # IO.puts("Input received")
 
     Process.send_after(self(), :loop, 250)
 
@@ -91,29 +96,8 @@ defmodule HelloNerves.Scene.Home do
   end
 
   def play_backing_track() do
-    audio_player_cmd =
-      if Application.get_env(:hello_nerves, :on_host) do
-        "afplay"
-      else
-        "aplay -q"
-      end
-
     file_name = "mary_btrack.wav"
 
-    spawn(fn ->
-      # if Mix.target() in [rpi, rpi2, rpi3], do: "#{audio_player} -q", else: audio_player
-
-      static_directory_path =
-        Path.join(:code.priv_dir(:hello_nerves), "audio")
-
-      full_path =
-        Path.join(static_directory_path, file_name)
-
-      "#{audio_player_cmd} #{full_path}" |> IO.inspect()
-      :os.cmd('#{audio_player_cmd} #{full_path}') |> IO.inspect()
-    end)
-  end
-
-  def loop do
+    Audio.play(file_name)
   end
 end

@@ -34,6 +34,7 @@ config :hello_nerves, :viewport,
     [
       module: Scenic.Driver.Local,
       window: [title: "hello_nerves"],
-      on_close: :stop_system
+      # might want stop_system
+      on_close: :stop_viewport
     ]
   ]
