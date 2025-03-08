@@ -1,6 +1,7 @@
 defmodule Audio do
   def killall() do
-    System.cmd("killall", [system_player()])
+    thing = System.cmd("killall", [system_player()])
+    IO.puts(inspect(thing) <> "<<<output>>>>")
   end
 
   def play(file_name) do
@@ -12,8 +13,6 @@ defmodule Audio do
         Path.join(static_directory_path, file_name)
 
       System.cmd(system_player(), build_cli_params(full_path))
-
-      Audio.play(file_name)
     end)
   end
 
