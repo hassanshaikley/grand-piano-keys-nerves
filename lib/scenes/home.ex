@@ -173,6 +173,7 @@ defmodule HelloNerves.Scene.Home do
 
   defp start_game(scene) do
     if scene.loop_iteration == 0 do
+      play_backing_track()
       Process.send(self(), :loop, [])
 
       :ok

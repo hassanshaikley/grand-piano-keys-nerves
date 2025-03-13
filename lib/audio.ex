@@ -31,4 +31,17 @@ defmodule Audio do
       ["-f", path]
     end
   end
+
+  def get_system_audio_player_pid() do
+    System.cmd("pgrep", ["-x", system_player()])
+    |> then(fn {pid, 0} ->
+      String.trim_trailing(pid, "\n")
+    end)
+  end
 end
+
+# Pause
+# kill -TSTP 76336
+
+# Play
+# kill -CONT  76336
