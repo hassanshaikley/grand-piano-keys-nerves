@@ -6,7 +6,6 @@ defmodule Game do
 
   @impl true
   def init(_) do
-    IO.puts("INITIALIZE GAME")
     # Hard coding this is not ideal
     # We can always load this information after
     # But this is just a prototype
@@ -61,8 +60,7 @@ defmodule Game do
 
   @impl true
   def terminate(reason, state) do
-    IO.inspect(reason)
-    IO.puts("TERMINATING--")
+    IO.inspect(reason, label: :termianting)
     :ok
   end
 end

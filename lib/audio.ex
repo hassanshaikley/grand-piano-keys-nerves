@@ -1,7 +1,6 @@
 defmodule Audio do
   def killall() do
-    thing = System.cmd("killall", [system_player()])
-    IO.puts(inspect(thing) <> "<<<output>>>>")
+    System.cmd("killall", [system_player()])
   end
 
   # c d e g

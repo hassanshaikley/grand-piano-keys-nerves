@@ -5,11 +5,9 @@ defmodule Mix.Tasks.Compile.MyCompiler do
   @impl Mix.Task.Compiler
   def run(args) do
     # Your compilation logic here
-    IO.puts("HELLO")
-    IO.puts("What")
+
     build_path = Mix.Project.build_path() |> IO.inspect(label: :bpath)
 
-    IO.puts("OK?")
     dest_folder = "lib/hello_nerves/priv/audio"
 
     dest_path = Path.join([build_path, dest_folder]) |> IO.inspect(label: :dest_path)
