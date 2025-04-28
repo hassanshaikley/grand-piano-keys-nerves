@@ -4,6 +4,12 @@ defmodule Audio do
     IO.puts(inspect(thing) <> "<<<output>>>>")
   end
 
+  # c d e g
+  def play_0(), do: play("c4.wav")
+  def play_1(), do: play("d4.wav")
+  def play_2(), do: play("e4.wav")
+  def play_3(), do: play("g4.wav")
+
   def play(file_name) do
     spawn(fn ->
       static_directory_path =

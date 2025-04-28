@@ -7,14 +7,6 @@ defmodule HelloNerves.Scene.Home do
   import Scenic.Primitives
   # import Scenic.Components
 
-  @note """
-    This is a very simple starter application.
-
-    If you want a more full-on example, please start from:
-
-    mix scenic.new.example
-  """
-
   @text_size 24
 
   # ============================================================================
@@ -76,8 +68,6 @@ defmodule HelloNerves.Scene.Home do
     game = elem(game, 1)
 
     game = put_in(game.primitives[1].transforms.translate, {100, 100 + loop_iteration})
-    # Graph.build(font: :roboto, font_size: @text_size)
-    # |> all_rects()
 
     game
   end
@@ -99,23 +89,22 @@ defmodule HelloNerves.Scene.Home do
   end
 
   # TBH this is for the laptop side, not sure yet if can associate this with gpio
-  # def handle_put({:key, {:key_1, 1, []}}, _context, scene) do
-  #   # Start the loop, the first key will always be the first
 
-  #   {:noreply, scene}
-  # end
-
-  def handle_input(event, _context, scene) do
-    # Logger.info("Received event: #{inspect(event)}")
-    # IO.puts("Input received")
-    # IO.inspect(event)
-
-    elem(event, 0)
-
+  # When they press 1 on the laptop it creates
+  # {:key, {:key_1, 0, []}} = event
+  #
+  @keys %{
+    key_0: 0,
+    key_1: 1,
+    key_2: 2,
+    key_3: 3
+  }
+  def handle_input({:key, {key, _, []}}, _context, scene) do
     with {:error, :started} <- start_game(scene) do
-      # Generate a random sequence of keys for the game
+      # If the game is start
+      key = @keys[key]
+      Game.press_key(key)
 
-      # scene = push_graph(scene, game_page(scene.graph_table, 0))
       {:noreply, scene}
     else
       _ ->
@@ -123,26 +112,10 @@ defmodule HelloNerves.Scene.Home do
     end
   end
 
-  defp handle_starting_input(event) do
-    event_info = elem(event, 1)
-
-    if match?({:key_1, 1, []}, event_info) do
-      {:already_started}
-    end
-  end
-
   def play_backing_track() do
-    file_name = "just_classical.wav"
+    file_name = "mary_btrack.wav"
 
     Audio.play(file_name)
-  end
-
-  # Generates a random sequence starting from zero, the first key is always zero because simplicity
-  defp generate_game_keys() do
-    [0] ++
-      Enum.map(1..25, fn i ->
-        Enum.random([0, 1, 2, 3])
-      end)
   end
 
   # generates all the rectangles
@@ -150,20 +123,31 @@ defmodule HelloNerves.Scene.Home do
     graph
     |> group(
       fn g ->
-        generate_game_keys()
+        Mary.keys()
         |> Enum.with_index()
         |> Enum.reduce(g, fn curr, acc ->
           key = elem(curr, 0)
           # Key is 1-4, like piano key 1, 2, 3 or 4
           index = elem(curr, 1)
-          x_offset = 140 + (key - 1) * 170
-          y_offset = 200 - 200 * index
 
-          rect(acc, {150, 198},
-            t: {x_offset, y_offset},
-            id: :rect_in,
-            fill: :white
-          )
+          if key == nil do
+            # Skip the nils. They are spaces with no musicc
+            # We are lazy so we put an invisible square
+            rect(acc, {0, 0},
+              t: {0, 0},
+              id: :rect_in,
+              fill: :white
+            )
+          else
+            x_offset = 140 + (key - 1) * 170
+            y_offset = 200 - 200 * index
+
+            rect(acc, {150, 198},
+              t: {x_offset, y_offset},
+              id: :rect_in,
+              fill: :white
+            )
+          end
         end)
       end,
       translate: {100, 100},

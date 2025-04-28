@@ -19,7 +19,6 @@ defmodule Main do
 
   # @impl true
   def init(elements) do
-    # Process.send_after(self(), :loop, 1000)
     setup()
 
     Logger.info("Hello")
@@ -28,6 +27,7 @@ defmodule Main do
 
   def setup do
     if Application.get_env(:hello_nerves, :on_host) do
+      :noop
     else
       # RPI Setup
 

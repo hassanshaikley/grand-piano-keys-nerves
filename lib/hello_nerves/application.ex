@@ -15,6 +15,7 @@ defmodule HelloNerves.Application do
         # Starts a worker by calling: HelloNerves.Worker.start_link(arg)
         # {HelloNerves.Worker, arg},
         {Main, []},
+        {GameSupervisor, []},
         {Scenic, [viewport_config]}
       ] ++ target_children()
 
