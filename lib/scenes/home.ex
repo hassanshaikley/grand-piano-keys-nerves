@@ -8,6 +8,7 @@ defmodule HelloNerves.Scene.Home do
   # import Scenic.Components
 
   @text_size 24
+  @fps 10
 
   # ============================================================================
   # setup
@@ -94,16 +95,21 @@ defmodule HelloNerves.Scene.Home do
   # {:key, {:key_1, 0, []}} = event
   #
   @keys %{
-    key_0: 0,
     key_1: 1,
     key_2: 2,
-    key_3: 3
+    key_3: 3,
+    key_4: 4
   }
   def handle_input({:key, {key, _, []}}, _context, scene) do
+    IO.inspect(key)
+
     with {:error, :started} <- start_game(scene) do
       # If the game is start
       key = @keys[key]
-      Game.press_key(key)
+
+      if key do
+        Game.press_key(key)
+      end
 
       {:noreply, scene}
     else
