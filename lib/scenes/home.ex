@@ -175,7 +175,10 @@ defmodule HelloNerves.Scene.Home do
   defp start_game(scene) do
     if !Map.get(scene, :started, false) do
       play_backing_track()
-      Process.send_after(self(), :loop, 2000)
+      # 120 BPM
+      # There is 2 seconds of nothing (4 beats)
+      # I move it 50s
+      Process.send_after(self(), :loop, 1950)
 
       :ok
     else
