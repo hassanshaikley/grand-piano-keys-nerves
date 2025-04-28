@@ -156,13 +156,19 @@ defmodule HelloNerves.Scene.Home do
               fill: :white
             )
           else
-            x_offset = 140 + (key - 1) * 170
+            x_offset = key * 150
+            # Start off 200 down,
             y_offset = 200 - 200 * index
 
-            rect(acc, {150, 198},
+            rect(acc, {150, 200},
               t: {x_offset, y_offset},
+              id: :rect_out,
+              fill: :black
+            )
+            |> rect({150 - 8, 200 - 8},
+              t: {x_offset + 4, y_offset + 4},
               id: :rect_in,
-              fill: :white
+              fill: {10, 10, 180}
             )
           end
         end)
@@ -177,7 +183,7 @@ defmodule HelloNerves.Scene.Home do
       play_backing_track()
       # 120 BPM
       # There is 2 seconds of nothing (4 beats)
-      # I move it 50s
+      # I move it 50s as sleight of hand, just improves the playing experience
       Process.send_after(self(), :loop, 1950)
 
       :ok

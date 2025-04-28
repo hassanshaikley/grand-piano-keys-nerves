@@ -1,5 +1,6 @@
 # TODO
 
-- Play Music
-- Make scenic work on RPI
+- Make sure work on RPI
 - Animate
+- Display Score
+-

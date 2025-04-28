@@ -28,7 +28,7 @@ config :scenic, :assets, module: HelloNerves.Assets
 
 config :hello_nerves, :viewport,
   size: {800, 480},
-  theme: :dark,
+  theme: :light,
   default_scene: HelloNerves.Scene.Home,
   drivers: [
     [
