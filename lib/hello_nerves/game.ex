@@ -29,28 +29,33 @@ defmodule Game do
   @impl true
   # Key is 0-3 corresponding to the keys on the "piano"
   def handle_call({:press_key, key}, _from, state) do
-    IO.puts("KEY PRESSED")
-    # TODO: Add handling for last key
-    [head | tail] = state.keys
-
+    # Make the sound ?
     case key do
-      0 -> Audio.play_0()
       1 -> Audio.play_1()
       2 -> Audio.play_2()
       3 -> Audio.play_3()
+      4 -> Audio.play_4()
     end
 
-    # No matter what we do, we want to remove the first key
-    # The either got their point or it was skipped
-    new_state =
-      state |> Map.put(:keys, tail)
+    # TODO: Add handling for last key
+    with true <- length(state.keys) > 0 do
+      [head | tail] = state.keys
 
-    # If key is correct increment score and remove the key from the keys
-    if(head == key) do
-      new_state = Map.put(new_state, :current_score, state.current_score + 1)
-      {:reply, :correct, new_state}
+      # No matter what we do, we want to remove the first key
+      # The either got their point or it was skipped
+      new_state =
+        state |> Map.put(:keys, tail)
+
+      # If key is correct increment score and remove the key from the keys
+      if(head == key) do
+        new_state = Map.put(new_state, :current_score, state.current_score + 1)
+        {:reply, :correct, new_state}
+      else
+        {:reply, :incorrect, new_state}
+      end
     else
-      {:reply, :incorrect, new_state}
+      # State has no keys left
+      false -> {:noreply, :noop, state}
     end
   end
 

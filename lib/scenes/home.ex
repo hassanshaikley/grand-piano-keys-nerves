@@ -8,7 +8,8 @@ defmodule HelloNerves.Scene.Home do
   # import Scenic.Components
 
   @text_size 24
-  @fps 10
+  # Easier to do this than deal with floats
+  @fps 25
 
   # ============================================================================
   # setup
@@ -40,18 +41,24 @@ defmodule HelloNerves.Scene.Home do
   end
 
   def terminate(_reason, _) do
-    IO.puts("KIllall")
     Audio.killall()
   end
 
   def handle_info(:loop, state) do
     loop_iteration = Map.get(state, :loop_iteration)
 
-    Process.send_after(self(), :loop, 25)
+    # Every 100 we step down
+    # Kind of a hack to do this before doing any processing that might take a couple milliseconds
+    # One other way would be to calculate how lon gthis fn takes and subtract that from the send_after time
+    Process.send_after(self(), :loop, div(1000, @fps))
 
     push_graph(state, game_page(state.graph_table, loop_iteration))
 
-    state = Map.put(state, :loop_iteration, loop_iteration + 10)
+    # 120 bpm for mary had a litle lamb
+    # 10 frames per secodn, need to move 1/5 of a key per frame
+    # key height is ~ 200 (198), 200/5 = 40
+
+    state = Map.put(state, :loop_iteration, loop_iteration + 1)
 
     {:noreply, state}
   end
@@ -68,7 +75,7 @@ defmodule HelloNerves.Scene.Home do
     [game] = :ets.lookup(table, "graph")
     game = elem(game, 1)
 
-    game = put_in(game.primitives[1].transforms.translate, {100, 100 + loop_iteration})
+    game = put_in(game.primitives[1].transforms.translate, {100, 100 + loop_iteration * 16})
 
     game
   end
@@ -100,9 +107,8 @@ defmodule HelloNerves.Scene.Home do
     key_3: 3,
     key_4: 4
   }
-  def handle_input({:key, {key, _, []}}, _context, scene) do
-    IO.inspect(key)
-
+  # 1 is down, 0 is up
+  def handle_input({:key, {key, 1, []}}, _context, scene) do
     with {:error, :started} <- start_game(scene) do
       # If the game is start
       key = @keys[key]
@@ -114,12 +120,17 @@ defmodule HelloNerves.Scene.Home do
       {:noreply, scene}
     else
       _ ->
+        scene = Map.put(scene, :started, true)
         {:noreply, scene}
     end
   end
 
+  def handle_input(_, _context, scene) do
+    {:noreply, scene}
+  end
+
   def play_backing_track() do
-    file_name = "mary_btrack.wav"
+    file_name = "mary_btrack_right.wav"
 
     Audio.play(file_name)
   end
@@ -162,9 +173,9 @@ defmodule HelloNerves.Scene.Home do
   end
 
   defp start_game(scene) do
-    if scene.loop_iteration == 0 do
+    if !Map.get(scene, :started, false) do
       play_backing_track()
-      Process.send(self(), :loop, [])
+      Process.send_after(self(), :loop, 2000)
 
       :ok
     else
