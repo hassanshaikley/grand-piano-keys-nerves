@@ -45,6 +45,7 @@ defmodule Game do
 
   @impl true
   # Key is 1-4 corresponding to the keys on the "piano"
+  # Returns current score (0 when invalid, not ideal but not a big deal)
   def handle_call({:press_key, key}, _from, state) do
     # Make the sound ?
     case key do
@@ -61,22 +62,23 @@ defmodule Game do
       # Just keep track of whether we already tried this note
       new_state = put_in(state, [:played_indexes, current_index], true)
 
-      current_key = Enum.at(state.keys, current_index) |> inspect() |> Logger.info()
+      current_key = Enum.at(state.keys, current_index)
 
-      # If key is correct increment score and remove the key from the keys
-      if(current_key == key) do
+      # Key is not zero indexed
+      # TODO: Just make them the same
+      if(current_key == key - 1) do
         new_state = Map.put(state, :current_score, state.current_score + 1)
-        {:reply, :correct, new_state}
+        {:reply, new_state.current_score, new_state}
       else
-        {:reply, :incorrect, new_state}
+        {:reply, state.current_score, new_state}
       end
     else
       # State has no keys left
       false ->
-        {:reply, :noop, state}
+        {:reply, 0, state}
 
       true ->
-        {:reply, :noop, state}
+        {:reply, 0, state}
 
       {:error, :already_played} ->
         # We will remove a point when you double play
@@ -84,7 +86,7 @@ defmodule Game do
 
         Logger.info("LOST POINT")
 
-        {:reply, :lost_point, new_state}
+        {:reply, new_state.current_score, new_state}
     end
   end
 

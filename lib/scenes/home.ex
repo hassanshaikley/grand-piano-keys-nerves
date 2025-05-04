@@ -36,7 +36,7 @@ defmodule HelloNerves.Scene.Home do
 
     graph_table = :ets.new(:game_graph, [:set])
 
-    scene = Map.put(scene, :graph_table, graph_table)
+    scene = Map.put(scene, :graph_table, graph_table) |> Map.put(:current_score, 0)
     {:ok, scene}
   end
 
@@ -86,10 +86,16 @@ defmodule HelloNerves.Scene.Home do
 
     graph =
       Graph.build(font: :roboto, font_size: @text_size)
-      # |> text("Current Score", fill: :green, font: :roboto_mono, font_size: 12)
       |> all_rects()
+      |> text("Score: #{scene.current_score}",
+        fill: :green,
+        font: :roboto_mono,
+        font_size: 18,
+        id: :current_score,
+        translate: {670, 30}
+      )
 
-    # Click hte ubtton so insert
+    # Click the button so insert
     :ets.insert(scene.graph_table, {"graph", graph})
 
     scene = push_graph(scene, game_page(scene.graph_table, 0))
@@ -114,11 +120,21 @@ defmodule HelloNerves.Scene.Home do
       # If the game is start
       key = @keys[key]
 
-      if key do
-        Game.press_key(key)
-      end
+      new_score = Game.press_key(key)
 
-      {:noreply, scene}
+      new_state = Map.put(scene, :score, new_score)
+      Logger.info(">>#{inspect(new_score)}")
+
+      # scene = update_child(scene, :current_score, "IDK", [])
+
+      # game = elem(game, 1)
+
+      # game = put_in(game.primitives[1].transforms.translate, {100, 100 + loop_iteration * 16})
+
+      # scene = Graph.modify(scene, :current_score, &text(&1, "hello"))
+      # scene = Graph.modify(game, :current_score, &text(&1, "Smaller Hello"))
+
+      {:noreply, new_state}
     else
       _ ->
         scene = Map.put(scene, :started, true)
@@ -157,7 +173,8 @@ defmodule HelloNerves.Scene.Home do
               fill: :white
             )
           else
-            x_offset = key * 150
+            # Move it 50 to the left, so we have space for current score
+            x_offset = key * 150 - 50
             # Start off 200 down,
             y_offset = 200 - 200 * index
 
