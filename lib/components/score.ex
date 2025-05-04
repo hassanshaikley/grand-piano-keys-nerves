@@ -4,36 +4,37 @@ defmodule HelloNerves.Components.Score do
 
   alias Scenic.{Graph, Primitive}
 
-  require Logger
+  def create_graph(current_score) do
+    Graph.build()
+    |> text("Score: #{to_string(current_score)}",
+      fill: :green,
+      font: :roboto_mono,
+      font_size: 18,
+      id: :current_score
+    )
+  end
 
-  @graph Graph.build()
-         |> text("Score: 0",
-           fill: :green,
-           font: :roboto_mono,
-           font_size: 18,
-           id: :current_score
-         )
-
-  def validate(_), do: {:ok, nil}
+  def validate(data) do
+    {:ok, data}
+  end
 
   def init(scene, _params, _opts) do
-    graph = @graph
+    graph = create_graph(0)
 
-    scene = push_graph(scene, @graph)
+    scene = push_graph(scene, graph)
 
     {:ok, scene}
   end
 
   def handle_call({:update_score, new_score}, _from, scene) do
-    Logger.info("UPDATING SCOREEE")
-    graph = update(scene, new_score)
-
-    push_graph(scene, @graph)
     {:noreply, scene}
   end
 
-  def handle_event(event, from, scene) do
-    Logger.info("handlign event")
+  def handle_update(new_score, opts, scene) do
+    scene =
+      scene
+      |> push_graph(create_graph(new_score))
+
     {:noreply, scene}
   end
 
@@ -46,15 +47,5 @@ defmodule HelloNerves.Components.Score do
       restart: :permanent,
       shutdown: 500
     }
-  end
-
-  defp update(state, new_score) do
-    Graph.build()
-    |> text("Score: #{to_string(new_score)}",
-      fill: :green,
-      font: :roboto_mono,
-      font_size: 18,
-      id: :current_score
-    )
   end
 end
