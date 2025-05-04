@@ -22,7 +22,7 @@ defmodule HelloNerves.Scene.Home do
     # a transparent full-screen rectangle to catch user input
     {width, height} = scene.viewport.size
 
-    Scenic.ViewPort.Input.capture(scene.viewport, [:key], []) |> IO.inspect()
+    Scenic.ViewPort.Input.capture(scene.viewport, [:key], [])
 
     # show the version of scenic and the glfw driver
     scenic_ver = Application.spec(:scenic, :vsn) |> to_string()
@@ -86,6 +86,7 @@ defmodule HelloNerves.Scene.Home do
 
     graph =
       Graph.build(font: :roboto, font_size: @text_size)
+      # |> text("Current Score", fill: :green, font: :roboto_mono, font_size: 12)
       |> all_rects()
 
     # Click hte ubtton so insert
@@ -185,6 +186,7 @@ defmodule HelloNerves.Scene.Home do
       # There is 2 seconds of nothing (4 beats)
       # I move it 50s as sleight of hand, just improves the playing experience
       Process.send_after(self(), :loop, 1950)
+      Process.send_after(Game, :start, 1950)
 
       :ok
     else

@@ -4,3 +4,6 @@
 - Animate
 - Display Score
 -
+
+- Rename Hoem
+- Rename Entire Project

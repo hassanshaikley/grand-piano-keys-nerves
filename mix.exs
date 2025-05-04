@@ -6,14 +6,14 @@ defmodule Mix.Tasks.Compile.MyCompiler do
   def run(args) do
     # Your compilation logic here
 
-    build_path = Mix.Project.build_path() |> IO.inspect(label: :bpath)
+    build_path = Mix.Project.build_path()
 
     dest_folder = "lib/hello_nerves/priv/audio"
 
-    dest_path = Path.join([build_path, dest_folder]) |> IO.inspect(label: :dest_path)
+    dest_path = Path.join([build_path, dest_folder])
 
     # Create destination directory if needed
-    File.mkdir_p!(dest_path) |> IO.inspect(label: :mkdir)
+    File.mkdir_p!(dest_path)
 
     # # Copy the folder
     File.cp_r!("audio", dest_path)
