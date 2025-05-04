@@ -30,6 +30,8 @@ defmodule HelloNerves.Components.Score do
     {:noreply, scene}
   end
 
+  # There are ways to update a graph as well
+  # But just keeping it simple / doing what works
   def handle_update(new_score, opts, scene) do
     scene =
       scene

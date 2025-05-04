@@ -7,7 +7,7 @@ defmodule Game do
   require Logger
 
   @time_between_notes 500
-  @allowed_ms_before_note 50
+  @allowed_ms_before_note 0
 
   @impl true
   def init(_) do
@@ -57,35 +57,41 @@ defmodule Game do
 
     # TODO: Add handling for last key
     with false <- is_nil(Map.get(state, :started_at)),
-         true <- length(state.keys) > 0,
-         current_index when is_integer(current_index) <- get_current_index(state) do
+         current_index when is_integer(current_index) <- get_current_index(state),
+         current_key when not is_nil(current_key) <- Enum.at(state.keys, current_index) do
       # Just keep track of whether we already tried this note
       new_state = put_in(state, [:played_indexes, current_index], true)
 
-      current_key = Enum.at(state.keys, current_index)
+      Logger.info(
+        "current_key: #{inspect(current_key)}, key: #{inspect(key - 1)}, current_index: #{inspect(current_index)}"
+      )
 
       # Key is not zero indexed
       # TODO: Just make them the same
       if(current_key == key - 1) do
-        new_state = Map.put(state, :current_score, state.current_score + 1)
+        new_state = Map.put(new_state, :current_score, state.current_score + 1)
 
         {:reply, new_state.current_score, new_state}
       else
+        # We will remove a point when you get it wrong
+
+        new_state = Map.put(state, :current_score, state.current_score - 1)
+
         {:reply, state.current_score, new_state}
       end
     else
-      # State has no keys left
-      false ->
-        {:reply, 0, state}
+      nil ->
+        # We will remove a point when you plahy when theres no note
+        new_state = Map.put(state, :current_score, state.current_score - 1)
+
+        {:reply, new_state.current_score, new_state}
 
       true ->
-        {:reply, 0, state}
+        {:reply, state.current_score, state}
 
       {:error, :already_played} ->
         # We will remove a point when you double play
         new_state = Map.put(state, :current_score, state.current_score - 1)
-
-        Logger.info("LOST POINT")
 
         {:reply, new_state.current_score, new_state}
     end
@@ -102,7 +108,7 @@ defmodule Game do
       DateTime.diff(DateTime.utc_now(), state.started_at, :millisecond)
 
     # Need the math max becuase right when we start we will get a negative number (first 50 ms)
-    current_index = div(max(millsecond_diff_from_start - @allowed_ms_before_note, 0), 500)
+    current_index = div(millsecond_diff_from_start, 500)
 
     already_played = get_in(state, [:played_indexes, current_index])
 
