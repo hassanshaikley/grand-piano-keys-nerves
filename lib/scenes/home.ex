@@ -35,8 +35,6 @@ defmodule HelloNerves.Scene.Home do
 
     scene = push_graph(scene, main_page())
 
-    scene = Map.put(scene, :loop_iteration, 0)
-
     graph_table = :ets.new(:game_graph, [:set])
 
     scene = Map.put(scene, :graph_table, graph_table) |> Map.put(:current_score, 0)
@@ -47,21 +45,25 @@ defmodule HelloNerves.Scene.Home do
     Audio.killall()
   end
 
-  def handle_info(:loop, state) do
-    loop_iteration = Map.get(state, :loop_iteration)
+  def handle_info(:start_loop, state) do
+    new_state = Map.put(state, :started_at, DateTime.utc_now())
+    # Hopefully this starts after we set the start time..if not we may want to do some hacks
+    send(self(), :loop)
 
+    {:noreply, new_state}
+  end
+
+  def handle_info(:loop, state) do
     # Every 100 we step down
     # Kind of a hack to do this before doing any processing that might take a couple milliseconds
     # One other way would be to calculate how lon gthis fn takes and subtract that from the send_after time
     Process.send_after(self(), :loop, div(1000, @fps))
 
-    push_graph(state, game_page(state.graph_table, loop_iteration))
+    push_graph(state, game_page(state.graph_table, state.started_at))
 
     # 120 bpm for mary had a litle lamb
     # 10 frames per secodn, need to move 1/5 of a key per frame
     # key height is ~ 200 (198), 200/5 = 40
-
-    state = Map.put(state, :loop_iteration, loop_iteration + 1)
 
     {:noreply, state}
   end
@@ -74,10 +76,24 @@ defmodule HelloNerves.Scene.Home do
 
   # I think always loop the same 4 keys, so make it look infinitely scrolling but place at
   # the top when you reach the bottom
-  def game_page(table, loop_iteration) do
+  def game_page(table, started_at) do
     [{_, game}] = :ets.lookup(table, "graph")
 
-    game = put_in(game.primitives[1].transforms.translate, {100, 100 + loop_iteration * 16})
+    offset_y =
+      if is_nil(started_at) do
+        0
+      else
+        millsecond_diff_from_start =
+          DateTime.diff(DateTime.utc_now(), started_at, :millisecond)
+
+        # 500 milliseconds = move the full height of 200
+        # 500 ms = 200
+        # 1000ms = 400
+
+        div(millsecond_diff_from_start * 20, 50)
+      end
+
+    game = put_in(game.primitives[1].transforms.translate, {100, 100 + offset_y})
 
     game
   end
@@ -99,7 +115,7 @@ defmodule HelloNerves.Scene.Home do
     # Click the button so insert
     :ets.insert(scene.graph_table, {"graph", graph()})
 
-    scene = push_graph(scene, game_page(scene.graph_table, 0))
+    scene = push_graph(scene, game_page(scene.graph_table, nil))
 
     {:noreply, scene}
   end
@@ -124,16 +140,7 @@ defmodule HelloNerves.Scene.Home do
 
       new_score = Game.press_key(key)
 
-      # Not ideal to assume it's the only child
-      # But works for now
-      # {:ok, [my_child_component: child_pid]} =
-      #   scene
-      #   |> Scenic.Scene.children()
       update_child(scene, @child_id, new_score, [])
-
-      # Logger.info("child pid #{inspect(child_pid)}")
-
-      # resp = GenServer.call(child_pid, {:update_score, new_score})
 
       {:noreply, scene}
     else
@@ -203,7 +210,7 @@ defmodule HelloNerves.Scene.Home do
       # 120 BPM
       # There is 2 seconds of nothing (4 beats)
       # I move it 50s as sleight of hand, just improves the playing experience
-      Process.send_after(self(), :loop, 1950)
+      Process.send_after(self(), :start_loop, 1950)
       Process.send_after(Game, :start, 1950)
 
       :ok

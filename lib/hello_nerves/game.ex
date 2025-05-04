@@ -58,6 +58,7 @@ defmodule Game do
     # TODO: Add handling for last key
     with false <- is_nil(Map.get(state, :started_at)),
          current_index when is_integer(current_index) <- get_current_index(state),
+         {:over, false} <- {:over, game_over?(current_index)},
          current_key when not is_nil(current_key) <- Enum.at(state.keys, current_index) do
       # Just keep track of whether we already tried this note
       new_state = put_in(state, [:played_indexes, current_index], true)
@@ -80,6 +81,10 @@ defmodule Game do
         {:reply, state.current_score, new_state}
       end
     else
+      {:over, true} ->
+        # Basically a noop
+        {:reply, state.current_score, state}
+
       nil ->
         # We will remove a point when you plahy when theres no note
         new_state = Map.put(state, :current_score, state.current_score - 1)
@@ -117,5 +122,15 @@ defmodule Game do
     else
       current_index
     end
+  end
+
+  # This is bad. It is hard coded
+  # Better to use the length of Mary.keys()
+  defp game_over?(current_index) when current_index <= 61 do
+    false
+  end
+
+  defp game_over?(_current_index) do
+    true
   end
 end
