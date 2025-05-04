@@ -11,6 +11,9 @@ defmodule HelloNerves.Scene.Home do
   # Easier to do this than deal with floats
   @fps 25
 
+  @child_id :my_child_component
+  @custom_event "custom_event"
+
   # ============================================================================
   # setup
 
@@ -72,31 +75,29 @@ defmodule HelloNerves.Scene.Home do
   # I think always loop the same 4 keys, so make it look infinitely scrolling but place at
   # the top when you reach the bottom
   def game_page(table, loop_iteration) do
-    [game] = :ets.lookup(table, "graph")
-    game = elem(game, 1)
+    [{_, game}] = :ets.lookup(table, "graph")
 
     game = put_in(game.primitives[1].transforms.translate, {100, 100 + loop_iteration * 16})
 
     game
   end
 
+  defp graph() do
+    graph =
+      Graph.build(font: :roboto, font_size: @text_size)
+      |> all_rects()
+      |> HelloNerves.Components.Score.add_to_graph(:init_data,
+        translate: {670, 30},
+        id: @child_id
+      )
+  end
+
   # The button to start game
   def handle_input({:cursor_button, {:btn_left, 1, [], _}}, _context, scene) do
     # Press button to start game
 
-    graph =
-      Graph.build(font: :roboto, font_size: @text_size)
-      |> all_rects()
-      |> text("Score: #{scene.current_score}",
-        fill: :green,
-        font: :roboto_mono,
-        font_size: 18,
-        id: :current_score,
-        translate: {670, 30}
-      )
-
     # Click the button so insert
-    :ets.insert(scene.graph_table, {"graph", graph})
+    :ets.insert(scene.graph_table, {"graph", graph()})
 
     scene = push_graph(scene, game_page(scene.graph_table, 0))
 
@@ -114,6 +115,7 @@ defmodule HelloNerves.Scene.Home do
     key_3: 3,
     key_4: 4
   }
+
   # 1 is down, 0 is up
   def handle_input({:key, {key, 1, []}}, _context, scene) do
     with {:error, :started} <- start_game(scene) do
@@ -122,19 +124,18 @@ defmodule HelloNerves.Scene.Home do
 
       new_score = Game.press_key(key)
 
-      new_state = Map.put(scene, :score, new_score)
-      Logger.info(">>#{inspect(new_score)}")
+      # Not ideal to assume it's the only child
+      # But works for now
+      # {:ok, [my_child_component: child_pid]} =
+      #   scene
+      #   |> Scenic.Scene.children()
+      update_child(scene, @child_id, new_score, [])
 
-      # scene = update_child(scene, :current_score, "IDK", [])
+      # Logger.info("child pid #{inspect(child_pid)}")
 
-      # game = elem(game, 1)
+      # resp = GenServer.call(child_pid, {:update_score, new_score})
 
-      # game = put_in(game.primitives[1].transforms.translate, {100, 100 + loop_iteration * 16})
-
-      # scene = Graph.modify(scene, :current_score, &text(&1, "hello"))
-      # scene = Graph.modify(game, :current_score, &text(&1, "Smaller Hello"))
-
-      {:noreply, new_state}
+      {:noreply, scene}
     else
       _ ->
         scene = Map.put(scene, :started, true)

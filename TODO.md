@@ -7,3 +7,4 @@
 
 - Rename Hoem
 - Rename Entire Project
+- Why did I use ETS?

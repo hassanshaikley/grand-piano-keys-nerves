@@ -68,6 +68,7 @@ defmodule Game do
       # TODO: Just make them the same
       if(current_key == key - 1) do
         new_state = Map.put(state, :current_score, state.current_score + 1)
+
         {:reply, new_state.current_score, new_state}
       else
         {:reply, state.current_score, new_state}
