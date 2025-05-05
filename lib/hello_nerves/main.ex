@@ -62,26 +62,34 @@ defmodule Main do
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_one, _stamp, falling}, state) do
-    IO.puts("BUTTOTN ONE EVENT #{falling}")
+  def handle_info({:circuits_gpio, @button_one, _stamp, true}, state) do
+    IO.puts("BUTTOTN one EVENT")
+
+    new_score = Game.press_key(1)
 
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_two, _stamp, falling}, state) do
-    IO.puts("BUTTOTN two EVENT #{falling}")
+  def handle_info({:circuits_gpio, @button_two, _stamp, true}, state) do
+    IO.puts("BUTTOTN two EVENT")
+
+    new_score = Game.press_key(2)
 
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_three, _stamp, falling}, state) do
-    IO.puts("BUTTOTN three EVENT #{falling}")
+  def handle_info({:circuits_gpio, @button_three, _stamp, true}, state) do
+    IO.puts("BUTTOTN three EVENT")
+
+    new_score = Game.press_key(3)
 
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_four, _stamp, falling}, state) do
-    IO.puts("BUTTOTN four EVENT #{falling}")
+  def handle_info({:circuits_gpio, @button_four, _stamp, true}, state) do
+    IO.puts("BUTTOTN four EVENT")
+
+    new_score = Game.press_key(4)
 
     {:noreply, state}
   end
