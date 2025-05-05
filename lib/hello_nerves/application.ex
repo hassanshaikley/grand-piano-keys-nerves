@@ -14,9 +14,9 @@ defmodule HelloNerves.Application do
         # Children for all targets
         # Starts a worker by calling: HelloNerves.Worker.start_link(arg)
         # {HelloNerves.Worker, arg},
-        {Main, []},
         {GameSupervisor, []},
-        {Scenic, [viewport_config]}
+        {Scenic, [viewport_config]},
+        {Main, []}
       ] ++ target_children()
 
     # See https://hexdocs.pm/elixir/Supervisor.html

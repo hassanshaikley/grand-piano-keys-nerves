@@ -37,6 +37,8 @@ defmodule HelloNerves.Scene.Home do
 
     graph_table = :ets.new(:game_graph, [:set])
 
+    Scenic.PubSub.subscribe(:breadboard_button_input)
+
     scene = Map.put(scene, :graph_table, graph_table) |> Map.put(:current_score, 0)
     {:ok, scene}
   end
@@ -47,10 +49,32 @@ defmodule HelloNerves.Scene.Home do
 
   def handle_info(:start_loop, state) do
     new_state = Map.put(state, :started_at, DateTime.utc_now())
+
     # Hopefully this starts after we set the start time..if not we may want to do some hacks
     send(self(), :loop)
 
     {:noreply, new_state}
+  end
+
+  # Don't really care to do anything with this event
+  def handle_info(
+        {{Scenic.PubSub, :registered},
+         {:breadboard_button_input, [registered_at: _registered_at]}},
+        state
+      ) do
+    {:noreply, state}
+  end
+
+  # This is when the breadborad press a button + calculate if the button was correct
+  def handle_info(
+        {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
+        state
+      ) do
+    Logger.info("EVENT HAPPENED")
+
+    update_child(scene, @child_id, new_score, [])
+
+    {:noreply, state}
   end
 
   def handle_info(:loop, state) do

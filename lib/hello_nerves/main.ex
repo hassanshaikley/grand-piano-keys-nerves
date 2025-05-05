@@ -26,6 +26,8 @@ defmodule Main do
   end
 
   def setup do
+    Scenic.PubSub.register(:breadboard_button_input)
+
     if Application.get_env(:hello_nerves, :on_host) do
       :noop
     else
@@ -49,23 +51,12 @@ defmodule Main do
     end
   end
 
-  # @impl true
-  def handle_info(:loop, state) do
-    # Process.send_after(self(), :loop, 1000)
-
-    # {:ok, gpio} = Circuits.GPIO.open(@button_one, :input)
-
-    # thing = Circuits.GPIO.read(gpio)
-
-    # IO.puts("Looping and thing is #{inspect(thing)}")
-
-    {:noreply, state}
-  end
-
   def handle_info({:circuits_gpio, @button_one, _stamp, true}, state) do
     IO.puts("BUTTOTN one EVENT")
 
     new_score = Game.press_key(1)
+
+    Scenic.PubSub.publish(:breadboard_button_input, new_score)
 
     {:noreply, state}
   end
@@ -75,6 +66,8 @@ defmodule Main do
 
     new_score = Game.press_key(2)
 
+    Scenic.PubSub.publish(:breadboard_button_input, new_score)
+
     {:noreply, state}
   end
 
@@ -83,6 +76,8 @@ defmodule Main do
 
     new_score = Game.press_key(3)
 
+    Scenic.PubSub.publish(:breadboard_button_input, new_score)
+
     {:noreply, state}
   end
 
@@ -90,6 +85,8 @@ defmodule Main do
     IO.puts("BUTTOTN four EVENT")
 
     new_score = Game.press_key(4)
+
+    Scenic.PubSub.publish(:breadboard_button_input, new_score)
 
     {:noreply, state}
   end
