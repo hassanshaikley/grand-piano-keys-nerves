@@ -14,15 +14,15 @@ defmodule Audio do
   def play_4(), do: play("g4.wav")
 
   def play(file_name) do
-    spawn(fn ->
-      static_directory_path =
-        Path.join(:code.priv_dir(:hello_nerves), "audio")
+    # spawn(fn ->
+    #   static_directory_path =
+    #     Path.join(:code.priv_dir(:hello_nerves), "audio")
 
-      full_path =
-        Path.join(static_directory_path, file_name)
+    #   full_path =
+    #     Path.join(static_directory_path, file_name)
 
-      System.cmd(system_player(), build_cli_params(full_path))
-    end)
+    #   System.cmd(system_player(), build_cli_params(full_path))
+    # end)
   end
 
   defp system_player() do
@@ -41,12 +41,12 @@ defmodule Audio do
     end
   end
 
-  def get_system_audio_player_pid() do
-    System.cmd("pgrep", ["-x", system_player()])
-    |> then(fn {pid, 0} ->
-      String.trim_trailing(pid, "\n")
-    end)
-  end
+  # def get_system_audio_player_pid() do
+  #   System.cmd("pgrep", ["-x", system_player()])
+  #   |> then(fn {pid, 0} ->
+  #     String.trim_trailing(pid, "\n")
+  #   end)
+  # end
 
   # Ma
   # defp set_audio_output_to_usb do

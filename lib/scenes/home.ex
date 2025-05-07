@@ -84,6 +84,8 @@ defmodule HelloNerves.Scene.Home do
         {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
         %{current_scene: 0} = scene
       ) do
+    # Scenic.PubSub.publish(:debug, "Switch to game scene")
+
     {:noreply, switch_to_game_scene(scene)}
   end
 
@@ -93,6 +95,7 @@ defmodule HelloNerves.Scene.Home do
         {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
         %{current_scene: 1, started: false} = scene
       ) do
+    # Scenic.PubSub.publish(:debug, "Starting got the event")
     {:noreply, start_game(scene)}
   end
 
@@ -101,7 +104,7 @@ defmodule HelloNerves.Scene.Home do
         {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
         scene
       ) do
-    Logger.info("EVENT HAPPENED")
+    # Scenic.PubSub.publish(:debug, "Breadboard button press")
 
     update_child(scene, @child_id, new_score, [])
 
@@ -139,7 +142,11 @@ defmodule HelloNerves.Scene.Home do
   def main_page() do
     Graph.build(font: :roboto, font_size: @text_size)
     |> rect({200, 50}, t: {10, 10}, id: :rect_in, fill: :blue, input: [:cursor_button])
-    |> text("Start Game", t: {110, 45}, text_align: :center)
+    |> text("Start Game!!", t: {110, 45}, text_align: :center)
+    |> HelloNerves.Components.Debug.add_to_graph(:init_data,
+      translate: {30, 30},
+      id: :debug_component
+    )
   end
 
   def score_page(score) do
@@ -180,6 +187,10 @@ defmodule HelloNerves.Scene.Home do
         translate: {670, 30},
         id: @child_id
       )
+      |> HelloNerves.Components.Debug.add_to_graph(:init_data,
+        translate: {30, 30},
+        id: :debug_component
+      )
   end
 
   # Button on keyboard
@@ -209,9 +220,7 @@ defmodule HelloNerves.Scene.Home do
 
   # 1 is down, 0 is up
   def handle_input({:key, {key, 1, []}}, _context, %{current_scene: 1, started: false} = scene) do
-    scene = start_game(scene)
-
-    {:noreply, scene}
+    {:noreply, start_game(scene)}
   end
 
   def handle_input({:key, {key, 1, []}}, _context, %{started: true} = scene) do

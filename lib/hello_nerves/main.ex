@@ -21,6 +21,10 @@ defmodule Main do
   def init(elements) do
     setup()
 
+    # Process.send_after(self(), :test, 1000)
+    # Process.send_after(self(), :test, 2000)
+
+    Logger.info("Hello")
     {:ok, elements}
   end
 
@@ -50,8 +54,18 @@ defmodule Main do
     end
   end
 
-  def handle_info({:circuits_gpio, @button_one, _stamp, 1}, state) do
-    IO.puts("BUTTOTN one EVENT")
+  # def handle_info(:test, state) do
+  #   Logger.info("BEFORE")
+  #   new_score = Game.press_key(1)
+  #   Logger.info("- #{inspect(new_score)}")
+
+  #   Scenic.PubSub.publish(:breadboard_button_input, new_score) |> IO.inspect()
+
+  #   {:noreply, state}
+  # end
+
+  def handle_info({:circuits_gpio, @button_one, _stamp, _}, state) do
+    Logger.info("BUTTOTN one EVENT")
 
     new_score = Game.press_key(1)
 
@@ -60,9 +74,7 @@ defmodule Main do
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_two, _stamp, 1}, state) do
-    IO.puts("BUTTOTN two EVENT")
-
+  def handle_info({:circuits_gpio, @button_two, _stamp, _}, state) do
     new_score = Game.press_key(2)
 
     Scenic.PubSub.publish(:breadboard_button_input, new_score)
@@ -70,9 +82,7 @@ defmodule Main do
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_three, _stamp, 1}, state) do
-    IO.puts("BUTTOTN three EVENT")
-
+  def handle_info({:circuits_gpio, @button_three, _stamp, _}, state) do
     new_score = Game.press_key(3)
 
     Scenic.PubSub.publish(:breadboard_button_input, new_score)
@@ -80,9 +90,7 @@ defmodule Main do
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_four, _stamp, 1}, state) do
-    IO.puts("BUTTOTN four EVENT")
-
+  def handle_info({:circuits_gpio, @button_four, _stamp, _}, state) do
     new_score = Game.press_key(4)
 
     Scenic.PubSub.publish(:breadboard_button_input, new_score)
@@ -91,7 +99,8 @@ defmodule Main do
   end
 
   def handle_info({:circuits_gpio, pin, _stamp, falling}, state) do
-    IO.puts("Pin: #{pin} - falling:#{falling}")
+    # Logger.info("Pin: #{pin} - falling:#{falling}")
+
     {:noreply, state}
   end
 end

@@ -25,16 +25,3 @@ else
 end
 
 config :scenic, :assets, module: HelloNerves.Assets
-
-config :hello_nerves, :viewport,
-  size: {800, 480},
-  theme: :light,
-  default_scene: HelloNerves.Scene.Home,
-  drivers: [
-    [
-      module: Scenic.Driver.Local,
-      window: [title: "hello_nerves"],
-      # might want stop_system
-      on_close: :stop_viewport
-    ]
-  ]
