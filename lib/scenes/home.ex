@@ -27,23 +27,24 @@ defmodule HelloNerves.Scene.Home do
 
     Scenic.ViewPort.Input.capture(scene.viewport, [:key], [])
 
-    # show the version of scenic and the glfw driver
-    scenic_ver = Application.spec(:scenic, :vsn) |> to_string()
-    driver_ver = Application.spec(:scenic_driver_local, :vsn) |> to_string()
-
-    info = "scenic: v#{scenic_ver}\nscenic_driver_local: v#{driver_ver}"
-
     scene = push_graph(scene, main_page())
 
     graph_table = :ets.new(:game_graph, [:set])
 
     Scenic.PubSub.subscribe(:breadboard_button_input)
 
-    scene = Map.put(scene, :graph_table, graph_table) |> Map.put(:current_score, 0)
+    scene =
+      Map.put(scene, :graph_table, graph_table)
+      |> Map.put(:started, false)
+      # 0 = Start Game Button
+      # 1 = Game Scene
+      |> Map.put(:current_scene, 0)
+
     {:ok, scene}
   end
 
-  def terminate(_reason, _) do
+  def terminate(reason, _) do
+    Logger.info("terminate - #{inspect(reason)}")
     Audio.killall()
   end
 
@@ -56,6 +57,18 @@ defmodule HelloNerves.Scene.Home do
     {:noreply, new_state}
   end
 
+  def handle_info(:show_score, scene) do
+    scene = push_graph(scene, score_page(Game.get_score()))
+
+    scene =
+      Map.put(scene, :current_scene, 2) |> Map.put(:started, false) |> Map.put(:started_at, nil)
+
+    Process.send_after(self(), :back_to_home_screen, 3_000)
+    Game.reset()
+
+    {:noreply, scene}
+  end
+
   # Don't really care to do anything with this event
   def handle_info(
         {{Scenic.PubSub, :registered},
@@ -65,15 +78,46 @@ defmodule HelloNerves.Scene.Home do
     {:noreply, state}
   end
 
+  # Button from breadboard
+  # The first button when the scene is 0
+  def handle_info(
+        {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
+        %{current_scene: 0} = scene
+      ) do
+    {:noreply, switch_to_game_scene(scene)}
+  end
+
+  # The second button press, when the game is not started
+  # And the current scene is 1
+  def handle_info(
+        {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
+        %{current_scene: 1, started: false} = scene
+      ) do
+    {:noreply, start_game(scene)}
+  end
+
   # This is when the breadborad press a button + calculate if the button was correct
   def handle_info(
         {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
-        state
+        scene
       ) do
     Logger.info("EVENT HAPPENED")
 
     update_child(scene, @child_id, new_score, [])
 
+    {:noreply, scene}
+  end
+
+  # When we switch to the score scene the loop can stop
+  def handle_info(:back_to_home_screen, scene) do
+    scene = push_graph(scene, main_page())
+    scene = Map.put(scene, :current_scene, 0)
+
+    {:noreply, scene}
+  end
+
+  # When we switch to the score scene the loop can stop
+  def handle_info(:loop, %{current_scene: 2} = state) do
     {:noreply, state}
   end
 
@@ -96,6 +140,12 @@ defmodule HelloNerves.Scene.Home do
     Graph.build(font: :roboto, font_size: @text_size)
     |> rect({200, 50}, t: {10, 10}, id: :rect_in, fill: :blue, input: [:cursor_button])
     |> text("Start Game", t: {110, 45}, text_align: :center)
+  end
+
+  def score_page(score) do
+    Graph.build(font: :roboto, font_size: @text_size)
+    |> rect({600, 200}, t: {100, 100}, id: :rect_in, fill: :blue, input: [:cursor_button])
+    |> text("New High Score of #{to_string(score)}", t: {400, 200}, text_align: :center)
   end
 
   # I think always loop the same 4 keys, so make it look infinitely scrolling but place at
@@ -132,16 +182,17 @@ defmodule HelloNerves.Scene.Home do
       )
   end
 
-  # The button to start game
+  # Button on keyboard
   def handle_input({:cursor_button, {:btn_left, 1, [], _}}, _context, scene) do
-    # Press button to start game
+    {:noreply, switch_to_game_scene(scene)}
+  end
 
-    # Click the button so insert
+  defp switch_to_game_scene(scene) do
     :ets.insert(scene.graph_table, {"graph", graph()})
 
     scene = push_graph(scene, game_page(scene.graph_table, nil))
 
-    {:noreply, scene}
+    Map.put(scene, :current_scene, 1)
   end
 
   # TBH this is for the laptop side, not sure yet if can associate this with gpio
@@ -157,21 +208,20 @@ defmodule HelloNerves.Scene.Home do
   }
 
   # 1 is down, 0 is up
-  def handle_input({:key, {key, 1, []}}, _context, scene) do
-    with {:error, :started} <- start_game(scene) do
-      # If the game is start
-      key = @keys[key]
+  def handle_input({:key, {key, 1, []}}, _context, %{current_scene: 1, started: false} = scene) do
+    scene = start_game(scene)
 
-      new_score = Game.press_key(key)
+    {:noreply, scene}
+  end
 
-      update_child(scene, @child_id, new_score, [])
+  def handle_input({:key, {key, 1, []}}, _context, %{started: true} = scene) do
+    key = @keys[key]
 
-      {:noreply, scene}
-    else
-      _ ->
-        scene = Map.put(scene, :started, true)
-        {:noreply, scene}
-    end
+    new_score = Game.press_key(key)
+
+    update_child(scene, @child_id, new_score, [])
+
+    {:noreply, scene}
   end
 
   def handle_input(_, _context, scene) do
@@ -179,7 +229,7 @@ defmodule HelloNerves.Scene.Home do
   end
 
   def play_backing_track() do
-    file_name = "mary_btrack_right.wav"
+    file_name = "mary_btrack_right_2.wav"
 
     Audio.play(file_name)
   end
@@ -229,17 +279,16 @@ defmodule HelloNerves.Scene.Home do
   end
 
   defp start_game(scene) do
-    if !Map.get(scene, :started, false) do
-      play_backing_track()
-      # 120 BPM
-      # There is 2 seconds of nothing (4 beats)
-      # I move it 50s as sleight of hand, just improves the playing experience
-      Process.send_after(self(), :start_loop, 1950)
-      Process.send_after(Game, :start, 1950)
+    play_backing_track()
+    # 120 BPM
+    # There is 2 seconds of nothing (4 beats)
+    # I move it 50s as sleight of hand, just improves the playing experience
+    Process.send_after(self(), :start_loop, 1950)
+    Process.send_after(Game, :start, 1950)
 
-      :ok
-    else
-      {:error, :started}
-    end
+    # Song is 30 or so secs
+    Process.send_after(self(), :show_score, 33_500)
+
+    Map.put(scene, :started, true)
   end
 end

@@ -21,3 +21,13 @@ config :nerves_runtime,
      }}
 
 config :hello_nerves, on_host: true
+
+# config :hello_nerves, :viewport,
+# size: {800, 600},
+# theme: :dark,
+# default_scene: HelloNerves.Scene.Home,
+# drivers: [
+#   [
+#     module: Scenic.Driver.Local
+#   ]
+# ]

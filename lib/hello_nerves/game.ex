@@ -31,6 +31,20 @@ defmodule Game do
     )
   end
 
+  def get_score() do
+    GenServer.call(
+      __MODULE__,
+      :get_score
+    )
+  end
+
+  def reset() do
+    GenServer.call(
+      __MODULE__,
+      :reset
+    )
+  end
+
   # This function is used to know which note we are currently on
   # Based off the time from when it starts we know the current note
   # Technically this is not necessary, as long as we know the start time we can figure out
@@ -41,6 +55,14 @@ defmodule Game do
 
     state = Map.put(state, :started_at, DateTime.utc_now())
     {:noreply, state}
+  end
+
+  def handle_call(:reset, _from, state) do
+    {:reply, :ok, Map.put(state, :current_score, 0) |> Map.put(:played_indexes, %{})}
+  end
+
+  def handle_call(:get_score, _from, state) do
+    {:reply, state.current_score, state}
   end
 
   @impl true
@@ -62,10 +84,6 @@ defmodule Game do
          current_key when not is_nil(current_key) <- Enum.at(state.keys, current_index) do
       # Just keep track of whether we already tried this note
       new_state = put_in(state, [:played_indexes, current_index], true)
-
-      Logger.info(
-        "current_key: #{inspect(current_key)}, key: #{inspect(key - 1)}, current_index: #{inspect(current_index)}"
-      )
 
       # Key is not zero indexed
       # TODO: Just make them the same

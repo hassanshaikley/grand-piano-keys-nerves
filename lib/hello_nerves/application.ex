@@ -16,6 +16,7 @@ defmodule HelloNerves.Application do
         # {HelloNerves.Worker, arg},
         {GameSupervisor, []},
         {Scenic, [viewport_config]},
+        HelloNerves.PubSub.Supervisor,
         {Main, []}
       ] ++ target_children()
 

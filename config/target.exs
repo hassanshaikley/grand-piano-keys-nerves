@@ -97,3 +97,13 @@ config :mdns_lite,
 config :hello_nerves, on_host: false
 
 # mi
+
+config :hello_nerves, :viewport,
+  size: {800, 600},
+  theme: :light,
+  default_scene: HelloNerves.Scene.Home,
+  drivers: [
+    [
+      module: Scenic.Driver.Local
+    ]
+  ]

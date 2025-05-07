@@ -1,6 +1,10 @@
 defmodule Audio do
   def killall() do
-    System.cmd("killall", [system_player()])
+    # Spawn because we want to be ok if it crashes ?
+    spawn(fn ->
+      nil
+      # System.cmd("killall", [system_player()])
+    end)
   end
 
   # c d e g
@@ -33,7 +37,7 @@ defmodule Audio do
     if Application.get_env(:hello_nerves, :on_host) do
       [path]
     else
-      ["-f", path]
+      ["-f", "S16_LE", "-vv", path]
     end
   end
 

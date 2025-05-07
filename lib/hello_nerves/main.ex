@@ -21,7 +21,6 @@ defmodule Main do
   def init(elements) do
     setup()
 
-    Logger.info("Hello")
     {:ok, elements}
   end
 
@@ -51,7 +50,7 @@ defmodule Main do
     end
   end
 
-  def handle_info({:circuits_gpio, @button_one, _stamp, true}, state) do
+  def handle_info({:circuits_gpio, @button_one, _stamp, 1}, state) do
     IO.puts("BUTTOTN one EVENT")
 
     new_score = Game.press_key(1)
@@ -61,7 +60,7 @@ defmodule Main do
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_two, _stamp, true}, state) do
+  def handle_info({:circuits_gpio, @button_two, _stamp, 1}, state) do
     IO.puts("BUTTOTN two EVENT")
 
     new_score = Game.press_key(2)
@@ -71,7 +70,7 @@ defmodule Main do
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_three, _stamp, true}, state) do
+  def handle_info({:circuits_gpio, @button_three, _stamp, 1}, state) do
     IO.puts("BUTTOTN three EVENT")
 
     new_score = Game.press_key(3)
@@ -81,7 +80,7 @@ defmodule Main do
     {:noreply, state}
   end
 
-  def handle_info({:circuits_gpio, @button_four, _stamp, true}, state) do
+  def handle_info({:circuits_gpio, @button_four, _stamp, 1}, state) do
     IO.puts("BUTTOTN four EVENT")
 
     new_score = Game.press_key(4)

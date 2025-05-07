@@ -34,8 +34,19 @@ To start your Nerves app:
 - Source: https://github.com/nerves-project/nerves
 
 export MIX_TARGET=rpi5
-export SCENIC_LOCAL_TARGET=cairo-fb
+export SCENIC_LOCAL_TARGET=cairo-fb # maybe mess with cairo-gtk
 export SCENIC_LOCAL_GL=gles3
+export NERVES_SYSTEM=rpi5
 
 brew install gtk+3 cairo pkg-config
 brew install glfw3 glew pkg-config
+
+# DO WE NEED
+
+BR2_PACKAGE_RPI_USERLAND=y
+BR2_PACKAGE_RPI_USERLAND_HELLO=y
+?
+
+softwareupdate --install -a
+
+- converted with ffmpeg and wav doesnt work ? so trying mpg321
