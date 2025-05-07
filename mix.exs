@@ -68,7 +68,7 @@ defmodule HelloNerves.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :runtime_tools, :scenic, :observer],
+      extra_applications: [:logger, :runtime_tools, :scenic],
       mod: {HelloNerves.Application, []}
     ]
   end

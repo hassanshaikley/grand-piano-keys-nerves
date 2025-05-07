@@ -17,17 +17,25 @@ https://hexdocs.pm/nerves/supported-targets.html
 ## Getting Started
 
 To start your Nerves app:
-  * `export MIX_TARGET=my_target` or prefix every command with
-    `MIX_TARGET=my_target`. For example, `MIX_TARGET=rpi3`
-  * Install dependencies with `mix deps.get`
-  * Create firmware with `mix firmware`
-  * Burn to an SD card with `mix burn`
+
+- `export MIX_TARGET=my_target` or prefix every command with
+  `MIX_TARGET=my_target`. For example, `MIX_TARGET=rpi3`
+- Install dependencies with `mix deps.get`
+- Create firmware with `mix firmware`
+- Burn to an SD card with `mix burn`
 
 ## Learn more
 
-  * Official docs: https://hexdocs.pm/nerves/getting-started.html
-  * Official website: https://nerves-project.org/
-  * Forum: https://elixirforum.com/c/nerves-forum
-  * Elixir Slack #nerves channel: https://elixir-slack.community/
-  * Elixir Discord #nerves channel: https://discord.gg/elixir
-  * Source: https://github.com/nerves-project/nerves
+- Official docs: https://hexdocs.pm/nerves/getting-started.html
+- Official website: https://nerves-project.org/
+- Forum: https://elixirforum.com/c/nerves-forum
+- Elixir Slack #nerves channel: https://elixir-slack.community/
+- Elixir Discord #nerves channel: https://discord.gg/elixir
+- Source: https://github.com/nerves-project/nerves
+
+export MIX_TARGET=rpi5
+export SCENIC_LOCAL_TARGET=cairo-fb
+export SCENIC_LOCAL_GL=gles3
+
+brew install gtk+3 cairo pkg-config
+brew install glfw3 glew pkg-config

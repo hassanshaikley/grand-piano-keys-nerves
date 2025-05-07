@@ -43,6 +43,16 @@ defmodule Audio do
       String.trim_trailing(pid, "\n")
     end)
   end
+
+  # Ma
+  # defp set_audio_output_to_usb do
+  #   try do
+  #     # System.cmd("amixer", ["cset", "numid=3", "1"], stderr_to_stdout: true)
+  #     :os.cmd('amixer cset numid=3 1')
+  #   rescue
+  #     e in ErlangError -> "Error!"
+  #   end
+  # end
 end
 
 # Pause
