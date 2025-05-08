@@ -2,8 +2,7 @@ defmodule Audio do
   def killall() do
     # Spawn because we want to be ok if it crashes ?
     spawn(fn ->
-      nil
-      # System.cmd("killall", [system_player()])
+      System.cmd("killall", [system_player()])
     end)
   end
 

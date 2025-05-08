@@ -21,6 +21,9 @@ defmodule HelloNerves.Scene.Home do
   def init(scene, _param, _opts) do
     Process.flag(:trap_exit, true)
 
+    # In case it doesn't properly exit from the last time we ran it
+    Audio.killall()
+
     # get the width and height of the viewport. This is to demonstrate creating
     # a transparent full-screen rectangle to catch user input
     {width, height} = scene.viewport.size
