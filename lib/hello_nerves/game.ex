@@ -16,7 +16,7 @@ defmodule Game do
     # But this is just a prototype
     # played_indexes is just to keep track of whether a note was guessed on, really can be a list
     keys = Mary.keys()
-    Scenic.PubSub.register(:debug)
+    # Scenic.PubSub.register(:debug)
     {:ok, %{keys: keys, current_score: 0, started_at: nil, played_indexes: %{}}}
   end
 
@@ -78,6 +78,8 @@ defmodule Game do
       4 -> Audio.play_4()
     end
 
+    # Scenic.PubSub.publish(:debug, "")
+
     # TODO: Add handling for last key
     with false <- is_nil(Map.get(state, :started_at)),
          current_index when is_integer(current_index) <- get_current_index(state),
@@ -102,12 +104,12 @@ defmodule Game do
     else
       {:over, true} ->
         # Basically a noop
-        Scenic.PubSub.publish(:debug, "Over")
+        # Scenic.PubSub.publish(:debug, "Over")
 
         {:reply, state.current_score, state}
 
       nil ->
-        Scenic.PubSub.publish(:debug, "nil")
+        # Scenic.PubSub.publish(:debug, "nil")
 
         # We will remove a point when you plahy when theres no note
         new_state = Map.put(state, :current_score, state.current_score - 1)
@@ -115,17 +117,22 @@ defmodule Game do
         {:reply, new_state.current_score, new_state}
 
       true ->
-        Scenic.PubSub.publish(:debug, "true")
+        # Scenic.PubSub.publish(:debug, "true")
 
         {:reply, state.current_score, state}
 
       {:error, :already_played} ->
-        Scenic.PubSub.publish(:debug, "already played")
+        # Scenic.PubSub.publish(:debug, "already played")
 
         # We will remove a point when you double play
         new_state = Map.put(state, :current_score, state.current_score - 1)
 
         {:reply, new_state.current_score, new_state}
+
+      error ->
+        # Scenic.PubSub.publish(:debug, "whoa #{inspect(error)}")
+
+        {:reply, state.current_score, state}
     end
   end
 

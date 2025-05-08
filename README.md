@@ -33,20 +33,19 @@ To start your Nerves app:
 - Elixir Discord #nerves channel: https://discord.gg/elixir
 - Source: https://github.com/nerves-project/nerves
 
+When building for RPI5 need this. For RPI4 should work the same (not 100% if cairo-fb though for the 4). For 3 and below you may need to change SCENIC_LOCAL and SCENIC_LOCAL_TARGET as well.
+
+```
 export MIX_TARGET=rpi5
 export SCENIC_LOCAL_TARGET=cairo-fb # maybe mess with cairo-gtk
 export SCENIC_LOCAL_GL=gles3
 export NERVES_SYSTEM=rpi5
+export MIX_ENV=target
+```
 
+Scenic docs say you need these for local as well
+
+```
 brew install gtk+3 cairo pkg-config
 brew install glfw3 glew pkg-config
-
-# DO WE NEED
-
-BR2_PACKAGE_RPI_USERLAND=y
-BR2_PACKAGE_RPI_USERLAND_HELLO=y
-?
-
-softwareupdate --install -a
-
-- converted with ffmpeg and wav doesnt work ? so trying mpg321
+```

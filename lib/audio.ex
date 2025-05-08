@@ -14,15 +14,15 @@ defmodule Audio do
   def play_4(), do: play("g4.wav")
 
   def play(file_name) do
-    # spawn(fn ->
-    #   static_directory_path =
-    #     Path.join(:code.priv_dir(:hello_nerves), "audio")
+    spawn(fn ->
+      static_directory_path =
+        Path.join(:code.priv_dir(:hello_nerves), "audio")
 
-    #   full_path =
-    #     Path.join(static_directory_path, file_name)
+      full_path =
+        Path.join(static_directory_path, file_name)
 
-    #   System.cmd(system_player(), build_cli_params(full_path))
-    # end)
+      System.cmd(system_player(), build_cli_params(full_path))
+    end)
   end
 
   defp system_player() do
