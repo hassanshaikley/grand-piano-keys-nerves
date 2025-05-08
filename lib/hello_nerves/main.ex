@@ -23,7 +23,7 @@ defmodule Main do
 
     # Scenic.PubSub.register(:debug)
 
-    Process.send_after(self(), :test, 1000)
+    # Process.send_after(self(), :test, 1000)
     # Process.send_after(self(), :test, 2000)
 
     Logger.info("Hello")
@@ -119,6 +119,6 @@ defmodule Main do
   def log(new_score) do
     # Scenic.PubSub.publish(:debug, "new score: #{inspect(new_score)}")
 
-    Process.send_after(self(), :clear_dbg)
+    # Process.send_after(self(), :clear_dbg)
   end
 end
