@@ -104,8 +104,6 @@ defmodule HelloNerves.Scene.Home do
         {{Scenic.PubSub, :data}, {:breadboard_button_input, new_score, _timestamp}},
         scene
       ) do
-    # Scenic.PubSub.publish(:debug, "Breadboard button press")
-
     update_child(scene, @child_id, new_score, [])
 
     {:noreply, scene}
@@ -143,10 +141,11 @@ defmodule HelloNerves.Scene.Home do
     Graph.build(font: :roboto, font_size: @text_size)
     |> rect({200, 50}, t: {10, 10}, id: :rect_in, fill: :blue, input: [:cursor_button])
     |> text("Start Game!!", t: {110, 45}, text_align: :center)
-    |> HelloNerves.Components.Debug.add_to_graph(:init_data,
-      translate: {30, 30},
-      id: :debug_component
-    )
+
+    # |> HelloNerves.Components.Debug.add_to_graph(:init_data,
+    #   translate: {30, 30},
+    #   id: :debug_component
+    # )
   end
 
   def score_page(score) do
@@ -187,10 +186,11 @@ defmodule HelloNerves.Scene.Home do
         translate: {670, 30},
         id: @child_id
       )
-      |> HelloNerves.Components.Debug.add_to_graph(:init_data,
-        translate: {30, 30},
-        id: :debug_component
-      )
+
+    # |> HelloNerves.Components.Debug.add_to_graph(:init_data,
+    #   translate: {30, 30},
+    #   id: :debug_component
+    # )
   end
 
   # Button on keyboard

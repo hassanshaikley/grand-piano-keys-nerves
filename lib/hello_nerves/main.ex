@@ -21,7 +21,7 @@ defmodule Main do
   def init(elements) do
     setup()
 
-    Scenic.PubSub.register(:debug)
+    # Scenic.PubSub.register(:debug)
 
     Process.send_after(self(), :test, 1000)
     # Process.send_after(self(), :test, 2000)
@@ -59,7 +59,7 @@ defmodule Main do
   def handle_info(:test, state) do
     resp = System.shell("aplay -l ", stderr_to_stdout: true)
 
-    Scenic.PubSub.publish(:debug, "hoo: #{inspect(resp)}")
+    # Scenic.PubSub.publish(:debug, "hoo: #{inspect(resp)}")
 
     Audio.play_1()
 
